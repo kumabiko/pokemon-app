@@ -9,6 +9,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [pokemonData, setPokemonData] = useState([]);
   const [nextURL, setNextURL] = useState("");
+  const [prevURL, setPrevURL] = useState("");
 
   useEffect(() => {
     const fetchPokemonData = async () => {
@@ -30,11 +31,22 @@ function App() {
     setPokemonData(_pokemonData);
   };
 
-  const handlePrevPage = async () => {};
+  const handlePrevPage = async () => {
+    if (!prevURL) return;
+    setLoading(true);
+    const data = await getAllPokemon(prevURL);
+    await loadPokemon(data.results);
+    setPrevURL(data.previous);
+    setNextURL(data.next);
+    setLoading(false);
+  };
+
   const handleNextPage = async () => {
     setLoading(true);
     const data = await getAllPokemon(nextURL);
     await loadPokemon(data.results);
+    setPrevURL(data.previous);
+    setNextURL(data.next);
     setLoading(false);
   };
 
@@ -51,9 +63,10 @@ function App() {
                 return <Card key={i} pokemon={pokemon}></Card>;
               })}
             </div>
-            <div className="btn"></div>
-            <button onClick={handlePrevPage}>前へ</button>
-            <button onClick={handleNextPage}>次へ</button>
+            <div className="btn">
+              <button onClick={handlePrevPage}>前へ</button>
+              <button onClick={handleNextPage}>次へ</button>
+            </div>
           </>
         )}
       </div>
